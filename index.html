@@ -3,126 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fireboy & Watergirl: Fixed</title>
+    <title>Fireboy Fixed v4</title>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; touch-action: none; font-family: 'Poppins', sans-serif; }
-        body { background: #050510; overflow: hidden; height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; color: white; }
+        body { background: #000; overflow: hidden; height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; color: white; }
         
         .glass {
-            background: rgba(20, 30, 60, 0.8);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(25, 25, 35, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 40px rgba(0,0,0,0.8);
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 16px;
+            padding: 20px;
             text-align: center;
             position: absolute;
             z-index: 100;
             width: 90%;
-            max-width: 400px;
+            max-width: 380px;
         }
         .hidden { display: none !important; }
         
-        h1 { font-weight: 800; font-size: 2rem; background: linear-gradient(to right, #ff4b4b, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
+        h1 { font-weight: 800; font-size: 1.8rem; background: linear-gradient(to right, #ff4b4b, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 15px; }
         
         input {
-            width: 100%; padding: 15px; margin: 8px 0;
-            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px; color: white; outline: none; font-size: 1rem; text-align: center; letter-spacing: 2px;
+            width: 100%; padding: 12px; margin: 8px 0;
+            background: #111; border: 1px solid #333;
+            border-radius: 8px; color: white; outline: none; font-size: 1rem; text-align: center;
         }
-        input:focus { border-color: #4facfe; }
         
         button {
-            width: 100%; padding: 15px; margin-top: 10px;
-            background: #4facfe; border: none; border-radius: 10px;
-            color: #000; font-weight: 800; font-size: 1rem; cursor: pointer;
+            width: 100%; padding: 12px; margin-top: 10px;
+            background: #4facfe; border: none; border-radius: 8px;
+            color: #000; font-weight: 800; cursor: pointer;
         }
-        button:active { transform: scale(0.96); }
-        button.sec { background: rgba(255,255,255,0.1); color: white; }
         button.red { background: #ff4b4b; }
-        
-        .code-display {
-            background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px;
-            display: flex; justify-content: space-between; align-items: center;
-            margin: 15px 0; border: 1px dashed #555;
-        }
-        .code-num { font-size: 1.5rem; font-weight: bold; color: #fbff00; letter-spacing: 3px; }
-        .copy-btn { width: auto; margin: 0; padding: 8px 15px; font-size: 0.8rem; }
+        button.sec { background: #333; color: #fff; }
 
-        #game-area { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #000; }
-        canvas { background: #1a1a1a; box-shadow: 0 0 30px #000; max-width: 100%; max-height: 100%; border: 2px solid #333; }
+        .code-box { background: #000; padding: 10px; border: 1px dashed #444; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .code-txt { font-family: monospace; font-size: 1.4rem; color: yellow; letter-spacing: 2px; }
+
+        #game-area { position: relative; width: 100%; height: 100%; background: #111; display: flex; align-items: center; justify-content: center; }
         
-        /* Mobile Controls */
-        .controls { position: absolute; bottom: 20px; width: 100%; height: 140px; display: flex; justify-content: space-between; padding: 0 20px; pointer-events: none; z-index: 50; }
-        .pad { position: relative; width: 140px; height: 140px; pointer-events: auto; }
+        /* Canvas ajustado para não estourar a tela */
+        canvas { 
+            background: #1a1a1a; 
+            max-width: 100%; 
+            max-height: 100%; 
+            display: block;
+            box-shadow: 0 0 20px black;
+        }
+
+        .controls { position: absolute; bottom: 10px; width: 100%; height: 120px; display: flex; justify-content: space-between; padding: 0 10px; pointer-events: none; z-index: 50; }
+        .pad { position: relative; width: 120px; height: 120px; pointer-events: auto; }
         .btn {
-            position: absolute; width: 60px; height: 60px;
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: rgba(255,255,255,0.8);
+            position: absolute; width: 55px; height: 55px;
+            background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;
         }
-        #b-up { top: 0; left: 40px; } #b-dn { bottom: 0; left: 40px; }
-        #b-lf { top: 40px; left: 0; } #b-rt { top: 40px; right: 0; }
-        #b-jmp { bottom: 20px; right: 10px; width: 80px; height: 80px; background: rgba(79, 172, 254, 0.3); }
+        #b-up { top: 0; left: 35px; } #b-dn { bottom: 0; left: 35px; }
+        #b-lf { top: 35px; left: 0; } #b-rt { top: 35px; right: 0; }
+        #b-jmp { bottom: 20px; right: 10px; width: 70px; height: 70px; background: rgba(79, 172, 254, 0.4); }
 
-        #hud { position: absolute; top: 10px; left: 20px; font-family: monospace; color: white; z-index: 10; pointer-events: none; text-shadow: 1px 1px 0 #000; font-size: 1.2rem; }
-        .status { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+        #hud { position: absolute; top: 10px; left: 10px; font-family: monospace; color: white; z-index: 10; pointer-events: none; font-size: 14px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; }
+        .status { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
+
+        /* ANTI-CRASH DISPLAY */
+        #error-log {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 9999; color: red;
+            padding: 20px; font-family: monospace; overflow: auto;
+            display: none;
+        }
     </style>
 </head>
 <body>
 
+    <div id="error-log">
+        <h2>ERRO FATAL DETECTADO</h2>
+        <p>Tire um print e mande para corrigir:</p>
+        <pre id="err-content"></pre>
+        <button onclick="location.reload()" style="margin-top:20px;">REINICIAR</button>
+    </div>
+
     <div id="s-login" class="glass">
-        <h1>ELEMENTAL</h1>
-        <input id="u-name" type="text" placeholder="Seu Nickname" maxlength="12">
-        <input id="u-pass" type="password" placeholder="Senha (min 4)" maxlength="20">
-        <button id="btn-login">CONECTAR</button>
-        <p id="status-msg" style="margin-top:10px; font-size:12px; color:#aaa">v 3.0 - Firebase Secure</p>
+        <h1>ELEMENTAL v4</h1>
+        <input id="u-name" type="text" placeholder="Nick" maxlength="10">
+        <input id="u-pass" type="password" placeholder="Senha" maxlength="10">
+        <button id="btn-login">ENTRAR</button>
+        <p id="st" style="margin-top:10px; font-size:10px; color:#666;">Sistema Seguro</p>
     </div>
 
     <div id="s-lobby" class="glass hidden">
         <h2>Olá, <span id="lbl-user" style="color:#4facfe"></span></h2>
-        
-        <div style="margin-top:20px;">
-            <p style="font-size:12px; color:#aaa; text-align:left;">SUA SALA:</p>
-            <div class="code-display">
-                <span id="room-code-display" class="code-num">--- ---</span>
-                <button class="copy-btn" onclick="copyCode()">📋</button>
-            </div>
-            <p style="font-size:11px; color:#888;">Mande esse número para seu amigo.</p>
+        <div class="code-box">
+            <span id="room-code-display" class="code-txt">......</span>
+            <button style="width:auto; padding:5px 10px; margin:0;" onclick="copyCode()">COPIAR</button>
         </div>
-
-        <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:20px 0;">
-
-        <input id="join-input" type="number" placeholder="Digite o Código (6 dígitos)">
+        <p style="font-size:10px; color:#888; margin-bottom:15px">Envie este código para seu amigo</p>
+        <hr style="border:0; border-top:1px solid #333; margin:10px 0;">
+        <input id="join-input" type="number" placeholder="Código do Amigo">
         <button id="btn-join" class="sec">ENTRAR NA SALA</button>
-        
-        <p style="font-size:12px; margin-top:15px; color:gold;">Save: Level <span id="saved-lvl">?</span></p>
+        <p style="margin-top:10px; font-size:12px; color:gold;">Save: Level <span id="saved-lvl">...</span></p>
     </div>
 
     <div id="s-char" class="glass hidden">
-        <h2 id="char-title">Configurar Jogo</h2>
-        <div id="host-controls">
-            <p style="margin-bottom:10px;">Você é o dono. Escolha seu personagem:</p>
-            <div style="display:flex; gap:10px; margin-bottom: 15px;">
-                <button class="red" onclick="startGame('fire')">JOGAR DE FIREBOY</button>
-                <button style="background:#4facfe" onclick="startGame('water')">JOGAR DE WATERGIRL</button>
+        <div id="host-panel">
+            <h3>Escolha seu Lado</h3>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="red" onclick="startGame('fire')">FOGO</button>
+                <button style="background:#4facfe" onclick="startGame('water')">ÁGUA</button>
             </div>
         </div>
-        <div id="guest-controls" class="hidden">
-            <div class="loader"></div>
-            <h3>Aguardando o Dono da sala iniciar...</h3>
-            <p style="font-size:12px; color:#aaa;">Prepare-se!</p>
+        <div id="guest-panel" class="hidden">
+            <h3>Aguardando Host...</h3>
+            <div style="margin:20px auto; width:30px; height:30px; border:3px solid #fff; border-top-color:transparent; border-radius:50%; animation:spin 1s infinite linear;"></div>
+            <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
         </div>
     </div>
 
     <div id="game-area" class="hidden">
         <canvas id="cvs"></canvas>
         <div id="hud">
-            <div><span class="status" style="background:#ff4b4b"></span><span id="h-p1">P1</span></div>
-            <div><span class="status" style="background:#4facfe"></span><span id="h-p2">P2</span></div>
-            <div style="margin-top:5px; color:#ffeb3b" id="h-lvl">Level 1</div>
+            <div><span class="status" style="background:#ff4b4b"></span><span id="h-p1">Jog.1</span></div>
+            <div><span class="status" style="background:#4facfe"></span><span id="h-p2">Jog.2</span></div>
+            <div id="h-lvl" style="color:yellow; margin-top:5px">Nível 1</div>
         </div>
         <div id="mobile-ctrl" class="controls hidden">
             <div class="pad">
@@ -135,9 +139,18 @@
         </div>
     </div>
 
+<script>
+    // ANTI-CRASH SYSTEM
+    window.onerror = function(msg, source, lineno, colno, error) {
+        document.getElementById('error-log').style.display = 'block';
+        document.getElementById('err-content').innerText = 
+            `Msg: ${msg}\nLinha: ${lineno}\nErro: ${error}`;
+        return false;
+    };
+</script>
+
 <script type="module">
-    // --- SUAS CHAVES ---
-    const firebaseConfig = {
+    const fbCfg = {
         apiKey: "AIzaSyBZjiISy9ylCMCE0K5BBRT39e_feeEMXXg",
         authDomain: "fireboy-6a92d.firebaseapp.com",
         databaseURL: "https://fireboy-6a92d-default-rtdb.firebaseio.com",
@@ -148,144 +161,292 @@
     };
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getDatabase, ref, set, get, onValue, remove } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+    import { getDatabase, ref, set, get, remove } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
-    const app = initializeApp(firebaseConfig);
+    const app = initializeApp(fbCfg);
     const db = getDatabase(app);
     
-    // Globals
-    let myUser = null;
-    let myData = { lvl: 0 };
-    let peer = null;
-    let conn = null;
-    let isHost = false;
-    let myShortCode = null;
-
-    // --- UI MANAGER ---
-    const screens = {
-        login: document.getElementById('s-login'),
-        lobby: document.getElementById('s-lobby'),
-        char: document.getElementById('s-char'),
-        game: document.getElementById('game-area')
-    };
-
-    function show(s) {
-        Object.values(screens).forEach(x => x.classList.add('hidden'));
-        screens[s].classList.remove('hidden');
-        if(s === 'game') setTimeout(GAME.resize, 200);
-    }
-
-    window.copyCode = () => {
-        if(myShortCode) {
-            navigator.clipboard.writeText(myShortCode);
-            alert("Código copiado!");
+    // VARIÁVEIS GLOBAIS
+    let ME = { u: null, lvl: 0, code: null };
+    let PEER = { inst: null, conn: null, host: false };
+    
+    // UI MANAGER
+    const UI = {
+        show: (id) => {
+            ['s-login', 's-lobby', 's-char', 'game-area'].forEach(i => document.getElementById(i).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
         }
     };
 
-    // --- LOGIN SYSTEM ---
+    window.copyCode = () => {
+        if(ME.code) { navigator.clipboard.writeText(ME.code); alert('Copiado!'); }
+    }
+
+    // --- LOGIN ---
     document.getElementById('btn-login').onclick = async () => {
-        const u = document.getElementById('u-name').value.trim();
+        const u = document.getElementById('u-name').value.trim().toUpperCase();
         const p = document.getElementById('u-pass').value.trim();
-        if(u.length < 3) return alert('Nome muito curto');
+        if(u.length < 2) return alert('Nick curto');
         
-        document.getElementById('status-msg').innerText = "Autenticando...";
-        
+        document.getElementById('st').innerText = "Conectando...";
         try {
-            // Check User/Pass
-            const userRef = ref(db, `users/${u}`);
-            const snap = await get(userRef);
-            
-            if(snap.exists()) {
-                const val = snap.val();
-                if(val.pass && val.pass !== p) return alert('Senha incorreta!');
-                myData.lvl = val.lvl || 0;
+            const r = ref(db, 'users/' + u);
+            const s = await get(r);
+            if(s.exists()) {
+                const d = s.val();
+                if(d.p !== p) return alert('Senha errada');
+                ME.lvl = d.l || 0;
             } else {
-                await set(userRef, { pass: p, lvl: 0 });
-                myData.lvl = 0;
+                await set(r, { p: p, l: 0 });
             }
-            
-            myUser = u;
-            initPeer();
-        } catch(e) { alert("Erro Conexão: " + e.message); }
+            ME.u = u;
+            startPeer();
+        } catch(e) { alert("Erro Net: " + e.message); }
     };
 
-    // --- PEER & ROOM SYSTEM ---
-    function initPeer() {
-        peer = new Peer(null, { debug: 1 });
-        
-        peer.on('open', (id) => {
-            document.getElementById('lbl-user').innerText = myUser;
-            document.getElementById('saved-lvl').innerText = (myData.lvl + 1);
+    // --- REDE ---
+    function startPeer() {
+        PEER.inst = new Peer(null);
+        PEER.inst.on('open', (id) => {
+            document.getElementById('lbl-user').innerText = ME.u;
+            document.getElementById('saved-lvl').innerText = (ME.lvl+1);
             
-            // Generate Short Code
-            myShortCode = Math.floor(100000 + Math.random() * 900000).toString();
-            document.getElementById('room-code-display').innerText = myShortCode;
+            // Gerar código curto
+            ME.code = Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('room-code-display').innerText = ME.code;
             
-            // Save Room to Firebase for lookups
-            set(ref(db, `rooms/${myShortCode}`), id);
+            // Salvar na DB temporariamente
+            set(ref(db, 'rooms/' + ME.code), id);
+            window.onbeforeunload = () => remove(ref(db, 'rooms/' + ME.code)); // Limpar ao sair
             
-            // Clean up on exit
-            window.onbeforeunload = () => remove(ref(db, `rooms/${myShortCode}`));
-
-            show('lobby');
+            UI.show('s-lobby');
         });
 
-        peer.on('connection', (c) => {
-            conn = c;
-            isHost = true;
+        PEER.inst.on('connection', (c) => {
+            PEER.conn = c;
+            PEER.host = true;
             setupConn();
-            document.getElementById('host-controls').classList.remove('hidden');
-            document.getElementById('guest-controls').classList.add('hidden');
-            show('char');
+            document.getElementById('host-panel').classList.remove('hidden');
+            document.getElementById('guest-panel').classList.add('hidden');
+            UI.show('s-char');
         });
     }
 
     document.getElementById('btn-join').onclick = async () => {
-        const code = document.getElementById('join-input').value;
-        if(code.length !== 6) return alert("O código deve ter 6 dígitos");
-        
-        document.getElementById('btn-join').innerText = "Buscando Sala...";
+        const c = document.getElementById('join-input').value;
+        if(c.length !== 6) return alert('Código deve ter 6 digitos');
         
         try {
-            const snap = await get(ref(db, `rooms/${code}`));
-            if(!snap.exists()) {
-                document.getElementById('btn-join').innerText = "ENTRAR NA SALA";
-                return alert("Sala não encontrada!");
-            }
+            const s = await get(ref(db, 'rooms/' + c));
+            if(!s.exists()) return alert('Sala não existe');
             
-            const hostId = snap.val();
-            conn = peer.connect(hostId);
-            isHost = false;
+            PEER.conn = PEER.inst.connect(s.val());
+            PEER.host = false;
             setupConn();
             
-            document.getElementById('host-controls').classList.add('hidden');
-            document.getElementById('guest-controls').classList.remove('hidden');
-            show('char');
-            
-        } catch(e) { alert("Erro ao entrar: " + e.message); }
+            document.getElementById('host-panel').classList.add('hidden');
+            document.getElementById('guest-panel').classList.remove('hidden');
+            UI.show('s-char');
+        } catch(e) { alert(e.message); }
     };
 
     function setupConn() {
-        conn.on('open', () => { console.log("Conectado!"); });
-        conn.on('data', (d) => {
-            if(d.t === 'start') {
-                GAME.start(d.role, d.lvl);
-            }
-            if(d.t === 'move') GAME.updateNet(d);
-            if(d.t === 'win') GAME.nextLevel(false);
+        PEER.conn.on('data', (d) => {
+            if(d.t === 'start') GAME.init(d.role, d.lvl);
+            if(d.t === 'upd') GAME.netUpdate(d);
+            if(d.t === 'win') GAME.next(false);
         });
     }
 
-    // --- START LOGIC ---
     window.startGame = (role) => {
-        if(isHost && conn) {
-            const otherRole = role === 'fire' ? 'water' : 'fire';
-            conn.send({ t: 'start', role: otherRole, lvl: myData.lvl });
-            GAME.start(role, myData.lvl);
+        if(PEER.host && PEER.conn) {
+            const opp = role === 'fire' ? 'water' : 'fire';
+            PEER.conn.send({ t:'start', role: opp, lvl: ME.lvl });
+            GAME.init(role, ME.lvl);
+        }
+    };
+
+    // --- ENGINE DO JOGO ---
+    const GAME = {
+        cvs: document.getElementById('cvs'),
+        ctx: document.getElementById('cvs').getContext('2d'),
+        run: false,
+        w: 800, h: 440,
+        walls: [], haz: [], doors: [],
+        me: {x:0, y:0, w:20, h:30, vx:0, vy:0, t:'fire'},
+        opp: {x:0, y:0, w:20, h:30, vx:0, vy:0, t:'water'},
+        keys: {}, lvl: 0,
+
+        init(role, lvl) {
+            this.run = true;
+            this.me.t = role;
+            this.opp.t = role === 'fire' ? 'water' : 'fire';
+            this.lvl = lvl;
+            
+            UI.show('game-area');
+            if(/Mobi/.test(navigator.userAgent)) document.getElementById('mobile-ctrl').classList.remove('hidden');
+
+            this.loadLvl();
+            
+            // Força o tamanho do canvas
+            this.cvs.width = this.w;
+            this.cvs.height = this.h;
+            
+            requestAnimationFrame(loop);
+            
+            // Inputs
+            window.onkeydown = e => this.keys[e.key.toLowerCase()] = true;
+            window.onkeyup = e => this.keys[e.key.toLowerCase()] = false;
+            
+            const touch = (id, k) => {
+                const el = document.getElementById(id);
+                el.ontouchstart = (e) => { e.preventDefault(); this.keys[k] = true; };
+                el.ontouchend = (e) => { e.preventDefault(); this.keys[k] = false; };
+            };
+            touch('b-up', 'w'); touch('b-dn', 's');
+            touch('b-lf', 'a'); touch('b-rt', 'd');
+            touch('b-jmp', ' ');
+        },
+
+        loadLvl() {
+            // Se passar do ultimo nivel, volta pro 0
+            const idx = this.lvl % LEVEL_DATA.length;
+            const map = LEVEL_DATA[idx];
+            
+            this.walls=[]; this.haz=[]; this.doors=[];
+            const ts = 40;
+            
+            document.getElementById('h-lvl').innerText = "Nível " + (this.lvl + 1);
+
+            for(let r=0; r<map.length; r++) {
+                for(let c=0; c<map[r].length; c++) {
+                    let ch = map[r][c], x = c*ts, y = r*ts;
+                    if(ch==='#') this.walls.push({x,y,w:ts,h:ts});
+                    if('FWA'.includes(ch)) this.haz.push({x,y:y+20,w:ts,h:20,t:ch});
+                    if('RB'.includes(ch)) this.doors.push({x,y,w:ts,h:ts*1.5,t:ch});
+                    
+                    if(ch==='1' && this.me.t==='fire') { this.me.x=x; this.me.y=y; }
+                    if(ch==='1' && this.opp.t==='fire') { this.opp.x=x; this.opp.y=y; }
+                    if(ch==='2' && this.me.t==='water') { this.me.x=x; this.me.y=y; }
+                    if(ch==='2' && this.opp.t==='water') { this.opp.x=x; this.opp.y=y; }
+                }
+            }
+            // Zera velocidade ao nascer
+            this.me.vx = 0; this.me.vy = 0;
+        },
+
+        update() {
+            let kL = this.keys['a'] || this.keys['arrowleft'];
+            let kR = this.keys['d'] || this.keys['arrowright'];
+            let kJ = this.keys['w'] || this.keys[' '] || this.keys['arrowup'];
+
+            // Fisica Simples
+            this.me.vx = kL ? -4 : (kR ? 4 : 0);
+            this.me.vy += 0.6; // Gravidade
+            
+            this.me.x += this.me.vx; this.col(this.me, 'x');
+            this.me.y += this.me.vy; this.col(this.me, 'y');
+            
+            if(kJ && this.me.g) { this.me.vy = -10; this.me.g = false; }
+            if(this.me.y > 600) this.loadLvl(); // Caiu no void
+
+            // Perigos
+            for(let h of this.haz) {
+                if(this.rect(this.me, h)) {
+                    if(h.t === 'A') this.loadLvl(); // Acido mata todos
+                    if(h.t === 'F' && this.me.t === 'water') this.loadLvl();
+                    if(h.t === 'W' && this.me.t === 'fire') this.loadLvl();
+                }
+            }
+
+            // Ganhou?
+            let myDoor = this.me.t === 'fire' ? 'R' : 'B';
+            let safe = false;
+            for(let d of this.doors) if(d.t === myDoor && this.rect(this.me, d)) safe = true;
+            this.me.safe = safe;
+
+            // Rede
+            if(PEER.conn && PEER.conn.open) {
+                PEER.conn.send({t:'upd', x:Math.round(this.me.x), y:Math.round(this.me.y), s:safe});
+            }
+
+            if(PEER.host && safe && this.opp.safe) this.next(true);
+        },
+
+        next(bd) {
+            this.lvl++;
+            if(bd) {
+                PEER.conn.send({t:'win'});
+                if(ME.u) set(ref(db, 'users/'+ME.u+'/l'), this.lvl); // Save
+            }
+            setTimeout(() => this.loadLvl(), 500);
+        },
+
+        netUpdate(d) {
+            this.opp.x = d.x; this.opp.y = d.y; this.opp.safe = d.s;
+        },
+
+        col(p, ax) {
+            if(ax==='y') p.g = false;
+            for(let w of this.walls) {
+                if(this.rect(p, w)) {
+                    if(ax==='x') p.x = p.vx > 0 ? w.x - p.w : w.x + w.w;
+                    else {
+                        if(p.vy > 0) { p.y = w.y - p.h; p.g = true; }
+                        else p.y = w.y + w.h;
+                        p.vy = 0;
+                    }
+                }
+            }
+        },
+
+        rect(a, b) { return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y; },
+
+        draw() {
+            // Fundo
+            this.ctx.fillStyle = '#111';
+            this.ctx.fillRect(0,0,this.w, this.h);
+            
+            // Paredes
+            this.ctx.fillStyle = '#666';
+            for(let w of this.walls) this.ctx.fillRect(w.x,w.y,w.w,w.h);
+            
+            // Perigos
+            for(let h of this.haz) {
+                this.ctx.fillStyle = h.t === 'F' ? '#d00' : h.t === 'W' ? '#00d' : '#0d0';
+                this.ctx.fillRect(h.x,h.y,h.w,h.h);
+            }
+            
+            // Portas
+            for(let d of this.doors) {
+                this.ctx.strokeStyle = d.t === 'R' ? '#f00' : '#00f';
+                this.ctx.lineWidth = 4;
+                this.ctx.strokeRect(d.x,d.y,d.w,d.h);
+            }
+
+            // Players
+            const drawP = (p) => {
+                this.ctx.fillStyle = p.t === 'fire' ? '#ff4b4b' : '#4facfe';
+                this.ctx.fillRect(p.x, p.y, p.w, p.h);
+            };
+            this.ctx.globalAlpha = 0.5; drawP(this.opp);
+            this.ctx.globalAlpha = 1.0; drawP(this.me);
+        }
+    };
+
+    function loop() {
+        if(GAME.run) {
+            try {
+                GAME.update();
+                GAME.draw();
+                requestAnimationFrame(loop);
+            } catch(e) {
+                alert("CRASH: " + e.message); // Alerta se o jogo morrer
+            }
         }
     }
 
-    // --- GAME ENGINE (FIXED) ---
+    // --- FASES (MAPAS) ---
     const LEVEL_DATA = [
         [
         "####################",
@@ -314,178 +475,6 @@
         "####################"
         ]
     ];
-
-    const GAME = {
-        cvs: document.getElementById('cvs'),
-        ctx: document.getElementById('cvs').getContext('2d'),
-        running: false,
-        width: 800, height: 440,
-        walls: [], hazards: [], doors: [],
-        me: {x:0, y:0, w:20, h:30, vx:0, vy:0, t:'fire'},
-        other: {x:0, y:0, w:20, h:30, vx:0, vy:0, t:'water'},
-        keys: {},
-        lvlIdx: 0,
-
-        start(role, lvl) {
-            this.running = true;
-            this.lvlIdx = lvl;
-            this.me.t = role;
-            this.other.t = role === 'fire' ? 'water' : 'fire';
-            
-            show('game');
-            if(/Mobi/.test(navigator.userAgent)) document.getElementById('mobile-ctrl').classList.remove('hidden');
-            
-            this.resize();
-            this.loadLevel();
-            requestAnimationFrame(loop);
-            
-            // Input Handlers
-            window.onkeydown = e => this.keys[e.key.toLowerCase()] = true;
-            window.onkeyup = e => this.keys[e.key.toLowerCase()] = false;
-            
-            const bindTouch = (id, k) => {
-                const el = document.getElementById(id);
-                el.ontouchstart = (e) => { e.preventDefault(); this.keys[k] = true; };
-                el.ontouchend = (e) => { e.preventDefault(); this.keys[k] = false; };
-            };
-            bindTouch('b-up', 'w'); bindTouch('b-dn', 's');
-            bindTouch('b-lf', 'a'); bindTouch('b-rt', 'd');
-            bindTouch('b-jmp', ' ');
-        },
-
-        resize() {
-            this.cvs.width = this.width;
-            this.cvs.height = this.height;
-        },
-
-        loadLevel() {
-            if(this.lvlIdx >= LEVEL_DATA.length) this.lvlIdx = 0;
-            const map = LEVEL_DATA[this.lvlIdx];
-            this.walls=[]; this.hazards=[]; this.doors=[];
-            const ts = 40;
-            
-            document.getElementById('h-lvl').innerText = "Level " + (this.lvlIdx + 1);
-
-            for(let r=0; r<map.length; r++) {
-                for(let c=0; c<map[r].length; c++) {
-                    let ch = map[r][c], x = c*ts, y = r*ts;
-                    if(ch==='#') this.walls.push({x,y,w:ts,h:ts});
-                    if('FWA'.includes(ch)) this.hazards.push({x,y:y+20,w:ts,h:20,t:ch});
-                    if('RB'.includes(ch)) this.doors.push({x,y,w:ts,h:ts*1.5,t:ch});
-                    
-                    if(ch==='1' && this.me.t==='fire') { this.me.x=x; this.me.y=y; }
-                    if(ch==='1' && this.other.t==='fire') { this.other.x=x; this.other.y=y; }
-                    if(ch==='2' && this.me.t==='water') { this.me.x=x; this.me.y=y; }
-                    if(ch==='2' && this.other.t==='water') { this.other.x=x; this.other.y=y; }
-                }
-            }
-        },
-
-        update() {
-            let kL = this.keys['a'] || this.keys['arrowleft'];
-            let kR = this.keys['d'] || this.keys['arrowright'];
-            let kJ = this.keys['w'] || this.keys[' '] || this.keys['arrowup'];
-
-            this.me.vx = kL ? -4 : (kR ? 4 : 0);
-            this.me.vy += 0.6; // Gravity
-            
-            this.me.x += this.me.vx; this.col(this.me, 'x');
-            this.me.y += this.me.vy; this.col(this.me, 'y');
-            
-            if(kJ && this.me.grounded) { this.me.vy = -10; this.me.grounded = false; }
-            if(this.me.y > 600) this.loadLevel();
-
-            // Hazard Collisions
-            for(let h of this.hazards) {
-                if(this.rect(this.me, h)) {
-                    if(h.t === 'A') this.loadLevel();
-                    if(h.t === 'F' && this.me.t === 'water') this.loadLevel();
-                    if(h.t === 'W' && this.me.t === 'fire') this.loadLevel();
-                }
-            }
-
-            // Win Condition
-            let myDoor = this.me.t === 'fire' ? 'R' : 'B';
-            let safe = false;
-            for(let d of this.doors) if(d.t === myDoor && this.rect(this.me, d)) safe = true;
-            this.me.safe = safe;
-
-            if(conn && conn.open) conn.send({t:'move', x:this.me.x, y:this.me.y, safe:safe});
-
-            if(isHost && safe && this.other.safe) this.nextLevel(true);
-        },
-
-        nextLevel(broadcast) {
-            this.lvlIdx++;
-            if(broadcast) {
-                conn.send({t:'win'});
-                // Save progress
-                if(myUser) set(ref(db, `users/${myUser}/lvl`), this.lvlIdx);
-            }
-            setTimeout(() => this.loadLevel(), 500);
-        },
-
-        updateNet(d) {
-            this.other.x = d.x; this.other.y = d.y; this.other.safe = d.safe;
-        },
-
-        col(p, ax) {
-            if(ax==='y') p.grounded = false;
-            for(let w of this.walls) {
-                if(this.rect(p, w)) {
-                    if(ax==='x') p.x = p.vx > 0 ? w.x - p.w : w.x + w.w;
-                    else {
-                        if(p.vy > 0) { p.y = w.y - p.h; p.grounded = true; }
-                        else p.y = w.y + w.h;
-                        p.vy = 0;
-                    }
-                }
-            }
-        },
-
-        rect(a, b) { return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y; },
-
-        draw() {
-            // Background (Fixes black screen issue)
-            this.ctx.fillStyle = '#1a1a1a';
-            this.ctx.fillRect(0,0,this.width, this.height);
-            
-            // Walls
-            this.ctx.fillStyle = '#666';
-            for(let w of this.walls) this.ctx.fillRect(w.x,w.y,w.w,w.h);
-            
-            // Hazards
-            for(let h of this.hazards) {
-                this.ctx.fillStyle = h.t === 'F' ? '#d00' : h.t === 'W' ? '#00d' : '#0d0';
-                this.ctx.fillRect(h.x,h.y,h.w,h.h);
-            }
-            
-            // Doors
-            for(let d of this.doors) {
-                this.ctx.strokeStyle = d.t === 'R' ? '#f00' : '#00f';
-                this.ctx.lineWidth = 4;
-                this.ctx.strokeRect(d.x,d.y,d.w,d.h);
-            }
-
-            // Players
-            const drawP = (p) => {
-                this.ctx.fillStyle = p.t === 'fire' ? '#ff4b4b' : '#4facfe';
-                this.ctx.fillRect(p.x, p.y, p.w, p.h);
-                // Eyes
-                this.ctx.fillStyle = '#fff';
-                if(p.vx < 0) this.ctx.fillRect(p.x+2, p.y+5, 5, 5);
-                else this.ctx.fillRect(p.x+12, p.y+5, 5, 5);
-            };
-            
-            this.ctx.globalAlpha = 0.5; drawP(this.other);
-            this.ctx.globalAlpha = 1.0; drawP(this.me);
-        }
-    };
-
-    function loop() {
-        if(GAME.running) { GAME.update(); GAME.draw(); requestAnimationFrame(loop); }
-    }
-    window.GAME = GAME;
 </script>
 </body>
 </html>
